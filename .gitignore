@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+.atl/
+odd/
+node_modules/
+.env
+.env.*
+!.env.example
+.coverage
+.coverage.*
+coverage/
+htmlcov/
+*.log
