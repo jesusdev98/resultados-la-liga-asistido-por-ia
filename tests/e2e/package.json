@@ -1,0 +1,14 @@
+{
+  "name": "laliga-real-qwen-tests",
+  "private": true,
+  "description": "External-install manifest for isolated local browser verification",
+  "devDependencies": {
+    "playwright": "1.64.1",
+    "v8-to-istanbul": "9.3.0",
+    "istanbul-lib-coverage": "3.2.2",
+    "istanbul-lib-report": "3.0.1",
+    "istanbul-reports": "3.2.0",
+    "istanbul-lib-instrument": "6.0.3",
+    "jsdom": "26.1.0"
+  }
+}

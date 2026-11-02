@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prueba DeepSeek · La Liga con IA local</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f172a'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%233b82f6' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%233b82f6'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>Prueba DeepSeek</h1>
+        <p class="subtitle">La Liga con IA local en tu navegador</p>
+      </div>
+      <div class="controls">
+        <label class="model-picker">
+          <span>Modelo</span>
+          <select id="model-select">
+            <option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC">Qwen2.5 1.5B · ~1 GB (recomendado)</option>
+            <option value="Llama-3.2-1B-Instruct-q4f16_1-MLC">Llama 3.2 1B · ~0.7 GB</option>
+            <option value="Qwen2.5-3B-Instruct-q4f16_1-MLC">Qwen2.5 3B · ~1.9 GB</option>
+          </select>
+        </label>
+        <button id="load-model" type="button" class="primary">Cargar modelo</button>
+        <span id="engine-status" class="chip chip-idle">Sin cargar</span>
+      </div>
+      <div class="progress-track" id="progress-track" hidden>
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+    </header>
+
+    <div id="notice" class="notice" hidden></div>
+
+    <main class="layout">
+      <section class="panel chat-panel" aria-label="Chat">
+        <div class="panel-head">
+          <h2>Preguntale a la IA</h2>
+          <button id="clear-chat" type="button" class="ghost">Limpiar</button>
+        </div>
+        <div id="chat-log" class="chat-log" aria-live="polite">
+          <article class="bubble bubble-assistant">
+            <div class="bubble-text">¡Hola! Preguntame por próximos partidos, resultados y clasificación.</div>
+          </article>
+        </div>
+        <form id="chat-form" class="chat-form">
+          <input id="chat-input" type="text" autocomplete="off"
+                 placeholder="Escribí tu pregunta…">
+          <button id="send-button" type="submit" class="primary">Enviar</button>
+        </form>
+        <p id="chat-hint" class="hint">Primero debés cargar el modelo para que pueda interactuar contigo.</p>
+      </section>
+
+      <aside class="panel data-panel" aria-label="Datos de La Liga">
+        <div class="panel-head">
+          <h2>Datos de La Liga</h2>
+          <div class="panel-meta">
+            <span id="today-label" class="today"></span>
+            <span id="data-updated" class="muted"></span>
+          </div>
+        </div>
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="standings" role="tab" aria-selected="true">Tabla</button>
+          <button class="tab" data-tab="results" role="tab" aria-selected="false">Resultados</button>
+          <button class="tab" data-tab="fixtures" role="tab" aria-selected="false">Próximos</button>
+        </div>
+        <div class="tab-body">
+          <div id="tab-standings" class="tab-pane active" role="tabpanel"></div>
+          <div id="tab-results" class="tab-pane" role="tabpanel" hidden></div>
+          <div id="tab-fixtures" class="tab-pane" role="tabpanel" hidden></div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      Inferencia 100% local en tu navegador · Datos: ESPN
+    </footer>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@mcp-b/global@6.0.3/dist/index.iife.js" defer></script>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
