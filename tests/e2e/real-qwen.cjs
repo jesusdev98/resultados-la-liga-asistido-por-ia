@@ -1,4 +1,4 @@
-/* Real Chrome/WebGPU/Qwen integration. No model or HTTP response substitution. */
+/* Real Chrome/WebGPU local-model integration. No model or HTTP response substitution. */
 const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
@@ -50,7 +50,7 @@ const matrix = [
 
 (async () => {
   let context;
-  const report = { base, model: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC', modelMocked: false,
+  const report = { base, model: process.env.LALIGA_MODEL || 'Llama-3.2-3B-Instruct-q4f32_1-MLC', modelMocked: false,
     cases: [], preflight: {}, coverage: null };
   const budgetMs = Number(process.env.LALIGA_RUN_TIMEOUT_MS) || 20 * 60 * 1000;
   const watchdog = setTimeout(() => {
@@ -105,7 +105,7 @@ const matrix = [
     await page.locator('#model-select').selectOption(report.model);
     const start = Date.now();
     await page.locator('#load-model').click();
-    console.log('MODEL_LOADING real Qwen; download may be required');
+    console.log(`MODEL_LOADING real ${report.model}; download may be required`);
     await page.waitForFunction(() => document.querySelector('#load-model')?.textContent.includes('Modelo cargado') ||
       document.querySelector('#engine-status')?.textContent === 'Error', null, { timeout: 900000 });
     assert.match(await page.locator('#load-model').innerText(), /Modelo cargado/);

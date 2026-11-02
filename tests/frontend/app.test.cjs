@@ -46,6 +46,32 @@ async function app(options = {}) {
   } catch (error) { h.close(); throw error; }
 }
 
+test('recommended Llama is selected without loading until explicitly requested', async () => {
+  const loads = [];
+  const h = await app({ engine: async model => { loads.push(model); return {}; } });
+  try {
+    assert.equal(h.$('#model-select').value, 'Llama-3.2-3B-Instruct-q4f32_1-MLC');
+    assert.match(h.$('#model-select').selectedOptions[0].textContent, /recomendado/);
+    assert.deepEqual(loads, []);
+    await h.ready();
+    assert.deepEqual(loads, ['Llama-3.2-3B-Instruct-q4f32_1-MLC']);
+  } finally { h.close(); }
+});
+
+test('saved Qwen choice remains selectable and loads only on request', async () => {
+  const loads = [];
+  const qwen = 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC';
+  const h = await app({ before(h) {
+    h.window.localStorage.setItem('prueba-deepseek:model', qwen);
+  }, engine: async model => { loads.push(model); return {}; } });
+  try {
+    assert.equal(h.$('#model-select').value, qwen);
+    assert.deepEqual(loads, []);
+    await h.ready();
+    assert.deepEqual(loads, [qwen]);
+  } finally { h.close(); }
+});
+
 test('boot, data panel, tabs and unready chat remain independent', async () => {
   const h = await app({ data: {
     today_label: 'Today', updated_at: 'bad date',
@@ -229,7 +255,7 @@ test('unknown saved model, absent panel data and empty selection use safe defaul
     assert.equal(h.$('#tab-standings').hidden, true);
     h.$('#model-select').value = '';
     await h.ready();
-    assert.equal(selected, 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC');
+    assert.equal(selected, 'Llama-3.2-3B-Instruct-q4f32_1-MLC');
     h.dispatch('#model-select', 'change');
     assert.equal(h.$('#engine-status').textContent, 'Sin cargar');
   } finally { h.close(); }

@@ -1,4 +1,4 @@
-# Test the actual local Qwen model
+# Test the actual local model
 
 `real-qwen.cjs` drives an isolated Chrome profile through the real load-model and
 chat controls. It never substitutes model completions or API responses. A safe
@@ -18,10 +18,17 @@ node tests/e2e/real-qwen.cjs
 ```
 
 Chrome must be installed and expose a real WebGPU adapter. The first run may
-download approximately 1 GB of Qwen weights. The profile is dedicated to these
+download approximately 1.81 GB of Llama weights, plus tokenizer/configuration/WASM.
+The registry estimates 2,951.51 MB GPU memory and a 4,096-token context; neither
+is a measured hardware guarantee. The profile is dedicated to these
 tests; it never attaches to a running user browser or imports cookies/storage.
 Runs use one browser/model sequentially, with no automatic retries or unsafe GPU
 flags. Existing downloaded weights may be reused on subsequent runs.
+
+The default is `Llama-3.2-3B-Instruct-q4f32_1-MLC`. To compare with the published
+baseline model, set `$env:LALIGA_MODEL = 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC'`.
+The historical runner filename remains unchanged; the selected model is recorded
+in `results.json`. Model selection does not alter prompts or generation budgets.
 
 To run only the reported Madrid conversation, set
 `$env:LALIGA_CASE_IDS = 'following-three-exact-user'` and
@@ -109,7 +116,7 @@ the external test home's `frontend-coverage/runs/` directory. It exits nonzero i
 any test fails or any statements, branches, functions, or lines remain uncovered.
 An incomplete report is not a 100% result. Node's experimental VM-module warning
 is expected with Node 22. Test-engine responses do not establish model quality;
-use the actual Qwen track above for that independent evidence.
+use the actual-model track above for that independent evidence.
 
 The recorded source-instrumented run passed 36 deterministic frontend tests and
 reached 100% statements, branches, functions and lines across `agent.js`, `app.js`,
@@ -143,7 +150,7 @@ teams/dates and exhausted corrections are tested as failures, not synthesized
 successes. Only the separately recorded actual-Qwen run establishes whether this
 contract works with the loaded model.
 
-### Latest actual-model outcome
+### Recorded Qwen outcome
 
 Run `2026-10-28T00-33-06-057Z` passed the result and contextual next-match turns,
 but failed the following-three turn. Tool selection, count and chronology were
@@ -151,3 +158,27 @@ correct; the first fixture narration repeated a contradictory provisional-status
 claim until the 160-token limit, leaving incomplete JSON. The parser rejected it
 and no partial cards/prose were published. This contract is **not yet reliable
 end to end** with the observed Qwen 1.5B run. No further automatic retry was made.
+
+### Initial Llama 3B outcome
+
+Run `2026-11-02T19-11-51-064Z` used the exact recommended model with WebLLM 0.2.79,
+unchanged prompts and budgets, and real API responses. Loading took 127,034 ms.
+The selected `following-three-exact-user` case failed its prerequisite narration:
+
+- `como quedo el madrid`: the tool returned Racing Santander 0–3 Real Madrid;
+  the writer instead emitted an unrelated refusal about alcohol and minors.
+  That text appeared with the result card; the existing result path did not reject it.
+- `vale y el proximo partido cuando es?`: the tool returned 7 November at 21:00;
+  the writer invented 28 November at 16:00. Validation rejected it as
+  `missing_fixture_fields`, preventing publication of that fixture answer.
+- The following-three turn was not reached. Case summary: 0 passed, 1 failed.
+
+This single attempt does not establish overall model superiority or a root cause.
+It demonstrates that changing the model alone did not fix this conversation.
+Raw completions, tool arguments and timing remain in the external run directory;
+no automatic retry or prompt correction was performed.
+
+After the model-selection change, 42 deterministic frontend tests passed with
+100% statements, branches, functions and lines across all five production modules.
+The 61 Python and 19 standalone Node tests also passed. These results do not
+override the failed real-model conversation.

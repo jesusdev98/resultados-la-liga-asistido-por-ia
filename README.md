@@ -1,12 +1,18 @@
 # Resultados La Liga asistido por IA
 
-## Estado de la versión inicial
+## Modelo recomendado y estado
 
-Este primer commit conserva el prototipo con Qwen2.5 1.5B antes del cambio a Llama 3.2 3B.
+El modelo recomendado es **Llama 3.2 3B q4f32**, el mismo del migrador de bases de datos.
+La versión inicial con Qwen2.5 1.5B se conserva en el commit `d01ef5d`.
+Qwen sigue disponible y se respeta cualquier modelo válido guardado previamente:
+selecciona Llama explícitamente si ya habías elegido otro. El SDK sigue en WebLLM 0.2.79;
+no se cambian prompts ni límites de generación. Recomendarlo no demuestra una mejora.
 Las pruebas deterministas registradas cubren los seis módulos Python y los cinco módulos
 JavaScript al 100% en sus métricas correspondientes, pero eso no garantiza respuestas
 correctas del modelo. La última conversación real pasó el resultado y el próximo partido,
 y falló al redactar los tres posteriores; no se publicó una lista parcial.
+El primer ensayo de Llama cargó el modelo, pero produjo una negativa ajena al fútbol
+y una fecha/hora inventadas: el cambio de modelo por sí solo **no resolvió la fiabilidad**.
 Los detalles, límites y comandos reproducibles están en [tests/e2e/README.md](tests/e2e/README.md).
 Los modelos y artefactos de prueba no se incluyen en el repositorio.
 
@@ -42,7 +48,7 @@ check_mcp.py   → prueba end-to-end del servidor MCP con el cliente oficial
 - Python 3.14 (probado con 3.14.4). La app web y `check.py` usan solo la stdlib; el servidor
   MCP opcional necesita un venv con el paquete `mcp` (ver «MCP opcional»).
 - Chrome o Edge 113+ con **WebGPU** habilitado (en Windows, aceleración por hardware activa).
-- ~1 GB de descarga la primera vez que cargás el modelo (queda cacheado en el navegador).
+- ~1.81 GB de pesos para Llama 3B, más tokenizer/configuración/WASM la primera vez (queda cacheado).
 
 ## Cómo correrlo (desde Windows)
 
@@ -62,12 +68,18 @@ python3 server.py --host 127.0.0.1 --port 8080
 
 | Modelo | ID | Tamaño aprox. |
 | --- | --- | --- |
-| Qwen2.5 1.5B (recomendado) | `Qwen2.5-1.5B-Instruct-q4f16_1-MLC` | ~1 GB |
+| Llama 3.2 3B (recomendado) | `Llama-3.2-3B-Instruct-q4f32_1-MLC` | ~1.81 GB de pesos |
+| Qwen2.5 1.5B | `Qwen2.5-1.5B-Instruct-q4f16_1-MLC` | ~1 GB |
 | Llama 3.2 1B | `Llama-3.2-1B-Instruct-q4f16_1-MLC` | ~0.7 GB |
 | Qwen2.5 3B | `Qwen2.5-3B-Instruct-q4f16_1-MLC` | ~1.9 GB |
 
 La descarga **nunca arranca sola**: tocá «Cargar modelo». La elección se guarda en
 `localStorage` (`prueba-deepseek:model`).
+
+Llama usa un contexto de 4096 tokens y una estimación de GPU de 2951.51 MB en el
+[registro de WebLLM 0.2.79](https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.79/lib/index.js).
+La descarga suma los pesos del [manifiesto oficial](https://huggingface.co/mlc-ai/Llama-3.2-3B-Instruct-q4f32_1-MLC/raw/main/ndarray-cache.json);
+no incluye otros recursos. Descarga y memoria GPU son magnitudes distintas, no garantías de carga.
 
 ## Cómo el modelo consulta la API (tool calling real)
 

@@ -7,7 +7,7 @@ import { safeTeamLogo, appendFixtureCard, appendResultCard } from "./match-cards
 
 const WEBLLM_URL = "https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.79/+esm";
 const MODEL_KEY = "prueba-deepseek:model";
-const DEFAULT_MODEL = "Qwen2.5-1.5B-Instruct-q4f16_1-MLC";
+const DEFAULT_MODEL = "Llama-3.2-3B-Instruct-q4f32_1-MLC";
 const MAX_HISTORY = 6; // last 3 turns, system prompt excluded
 
 const state = {
